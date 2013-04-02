@@ -3,7 +3,10 @@ import csv
 
 def load_users(session):
     # use u.user
-    pass
+    with open('u.user', 'rb') as f:
+        reader = csv.reader(f, delimiter='|', quoting=csv.QUOTE_NONE)
+        for row in reader:
+            print row
 
 def load_movies(session):
     # use u.item
@@ -20,3 +23,5 @@ def main(session):
 if __name__ == "__main__":
     s= model.connect()
     main(s)
+
+load_users
