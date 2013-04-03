@@ -5,10 +5,10 @@ from datetime import datetime
 # open a file - YAY!
 # read a line - YAY!
 # parse a line - YAY!
-# create an object
-# add the object to a session
-# commit
-# repeat until done
+# create an object - YAY!
+# add the object to a session - YAY!
+# commit - YAY!
+# repeat until done - YAY!
 
 def load_users(session):     
     # use u.user   
