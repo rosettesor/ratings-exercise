@@ -1,6 +1,6 @@
 import model
 import csv
-from datetime import datetime
+from datetime import date, time, datetime
 
 # open a file - YAY!
 # read a line - YAY!
@@ -22,14 +22,18 @@ def load_movies(session):
     # use u.item
     with open('seed_data/u.item') as f:
         reader = csv.reader(f, delimiter='|')
+        date_format = '%d-%b-%Y'
         for row in reader:
-            movie = model.Movie(id=row[0], released_at=row[2], imbd_url=row[4])
+            movie = model.Movie(id=row[0], imbd_url=row[4])
             formatted_title = row[1]
             formatted_title = formatted_title.decode("latin-1")
             movie.name = formatted_title
-            # date_string = row[2]
-            # split date_string
-            # date_string = datetime.strptime(%s= , format)
+            date_string = row[2]
+            if date_string:
+                formatted_date = datetime.strptime(date_string, date_format)
+                movie.released_at = formatted_date
+            else:
+                None
             session.add(movie)
 
 def load_ratings(session):
