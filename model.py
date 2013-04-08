@@ -1,14 +1,16 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship, backref
 
 
-Engine = None
-Session = None
+engine = create_engine("sqlite:///ratings.db", echo=False)
+session = scoped_session(sessionmaker(bind=engine, autocommit=False, autoflush=False))
+
 Base = declarative_base()
+Base.query = session.query_property()
 
 ### Class declarations go here
 class User(Base):
@@ -43,11 +45,12 @@ class Rating(Base):
 	__tablename__ = "ratings"
 
 	id = Column(Integer, primary_key = True)
-	movie_id = Column(Integer, nullable=True)
+	movie_id = Column(Integer, ForeignKey('movies.id'))
 	user_id = Column(Integer, ForeignKey('users.id'))
 	rating = Column(Integer, nullable=True)
 
 	user = relationship("User", backref=backref("ratings", order_by=id))
+	movie = relationship("Movie", backref=backref("ratings", order_by=id))
 
 	# def __init__(self, movie_id = None, user_id = None, rating = None):
 	# 	self.movie_id = movie_id
@@ -56,14 +59,14 @@ class Rating(Base):
 
 ### End class declarations
 
-def connect():
-	global Engine
-	global Session
+# def connect():
+# 	global Engine
+# 	global Session
 
-	Engine = create_engine("sqlite:///ratings.db", echo=True)
-	Session = sessionmaker(bind=Engine)
+# 	Engine = create_engine("sqlite:///ratings.db", echo=True)
+# 	Session = sessionmaker(bind=Engine)
 
-	return Session()
+# 	return Session()
 
 def main():
     """In case we need this for something"""

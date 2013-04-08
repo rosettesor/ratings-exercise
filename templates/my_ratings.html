@@ -1,0 +1,8 @@
+<html>
+<h2>My Ratings </h2>
+{% for rating in mine %}
+Movie: {{ rating.movie.name }}<br>
+Rating: {{ rating.rating }}<br>
+<p>
+{% endfor %}
+</html>

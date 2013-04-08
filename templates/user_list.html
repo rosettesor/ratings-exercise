@@ -1,0 +1,5 @@
+<html>
+{% for user in users %}
+<h2>User {{ user.id }}, age {{ user.age }} had {{ user.ratings|length }} ratings</h2>
+{% endfor %}
+</html>
