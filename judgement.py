@@ -1,4 +1,5 @@
-from flask import Flask, render_template, redirect, request, session
+
+from flask import Flask, render_template, redirect, request, session, url_for
 import model
 
 app = Flask(__name__)
@@ -54,6 +55,16 @@ def login_user():
 def my_ratings():
 	my_ratings = model.session.query(model.Rating).filter_by(user_id=session['id']).all()
 	return render_template("my_ratings.html", mine = my_ratings)
+
+@app.route("/change_rating", methods = ["POST"])
+def change_rating():
+	movie_change = request.form['movie_name']
+	find_movie = model.session.query(model.Movie).filter_by(name=movie_change).first()
+	rating_change = request.form['new_rating']
+	current_rating = model.session.query(model.Rating).filter(model.Rating.user_id==session['id'], model.Rating.movie_id==find_movie.id).first()
+	current_rating.rating = rating_change
+	model.session.commit()
+	return redirect("/my_ratings")
 
 if __name__ == "__main__":
 	app.run(debug = True)
