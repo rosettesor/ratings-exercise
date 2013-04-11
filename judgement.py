@@ -31,6 +31,44 @@ def save_user():
 	model.session.commit()
 	return redirect("/")
 
+@app.route("/movie/<int:id>",  methods = ["GET", "POST"])
+def view_movie(id):
+	movie = model.session.query(model.Movie).get(id)
+	ratings = movie.ratings
+	rating_nums = []
+	user_rating = None
+	for r in ratings:
+		if r.user_id == session['id']:
+			user_ratingr = r
+		rating_nums.append(r.rating)
+	avg_rating = float(sum(rating_nums))/len(rating_nums)
+
+	# prediction code: only predict if the user hasn't rated yet
+	user = model.session.query(model.User).get(session['id'])
+	prediction = None
+	if not user_rating:
+		prediction = user.predict_rating(movie)
+		effective_rating = prediction
+	else:
+		effective_rating = user_rating.rating
+	# end prediction
+
+	#now including the eye's opinion
+	the_eye = model.session.query(model.User).filter_by(email="theeye@ofjudgement.com").one()
+	eye_rating = model.session.query(model.Rating).filter_by(user_id=the_eye.id, movie_id=movie.id).first()
+	if not eye_rating:
+		eye_rating = the_eye.predict_rating(movie)
+	else:
+		eye_rating = eye_rating.rating
+	difference = abs(eye_rating - effective_rating)
+
+	messages = [ "I suppose you don't have such bad taste after all.",
+             "I regret every decision that I've ever made that has brought me to listen to your opinion.",
+             "Words fail me, as your taste in movies has clearly failed you.",
+             "That movie is great. For a clown to watch. Idiot."]
+	beratement = messages[int(difference)]
+	return render_template("movie.html", movie = movie, average = avg_rating, user_rating = user_rating, prediction = prediction, beratement = beratement)
+
 @app.route("/login")
 def login():
 	return render_template("login.html")
